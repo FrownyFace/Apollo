@@ -25,12 +25,23 @@ def save_data(path):
         for i in cur_file.as_matrix():
             #print(i[1], i[2], i[3]-36)
             data[i[1]:i[2], i[3]-34] = 1
-        data = np.asarray([data[i:i+batch_size] for i in range(0, len(cur_file), batch_size)])
+        data = np.squeeze(np.array([np.array(data[i:i+batch_size]).flatten(order='C') for i in range(0, len(cur_file), batch_size)]))
+        #data = np.asarray([[data[i+j] for j in range(batch_size)] for i in range(0, len(cur_file), batch_size)])
+        #print(data.shape)
+        #print(data[3])
         files.append(data)
+        #break
 
     print(len(files))
-    with open('./data/jsb_train.pkl','wb') as p:
+    with open('./data/jsb_train.pkl', 'wb') as p:
         pickle.dump(files, p)
 
+def load_data(path):
+    with open(path, "rb") as f:
+        while True:
+            try:
+                yield pickle.load(f)
+            except EOFError:
+                break
 
-save_data('./data/SymbolicMusicMidiDataV1.0/jsb_train.csv')
+#save_data('./data/SymbolicMusicMidiDataV1.0/jsb_train.csv')
